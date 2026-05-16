@@ -1,0 +1,22 @@
+{
+  "name": "Skillak — منصة التعليم المباشر",
+  "short_name": "Skillak",
+  "description": "تعلّم أي مهارة من معلم حقيقي عبر جلسة فيديو مباشرة",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#060f23",
+  "theme_color": "#1565c0",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "استكشاف المعلمين", "short_name": "استكشف", "url": "./index.html#explore", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "لوحة التحكم", "short_name": "لوحتي", "url": "./index.html#dashboard", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}

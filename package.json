@@ -1,0 +1,18 @@
+{
+  "name": "skillak-hub",
+  "version": "1.0.0",
+  "description": "منصة Skillak للتعليم الذكي — جلسات Google Meet",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "dotenv": "^16.4.5"
+  }
+}
