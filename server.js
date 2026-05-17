@@ -6,8 +6,31 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const STATIC_DIR = __dirname;
 
+// ── Performance & Security headers ──
+app.use((req, res, next) => {
+  // Allow Google Meet to be embedded in iframe from this site
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  // Allow camera/microphone in iframes (needed for embedded Meet)
+  res.setHeader('Permissions-Policy', 'camera=*, microphone=*, display-capture=*, fullscreen=*');
+  // Security
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static(STATIC_DIR, { extensions: ['html'] }));
+
+// Cache static assets aggressively (JS/CSS/images)
+app.use(express.static(STATIC_DIR, {
+  extensions: ['html'],
+  setHeaders: (res, filePath) => {
+    if (filePath.match(/\.(js|css|png|jpg|jpeg|webp|woff2?|svg|ico)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    } else if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    }
+  }
+}));
 
 // Always prefer refresh token (gives fresh token every call — never expires).
 // Falls back to static access token only if no refresh credentials are configured.

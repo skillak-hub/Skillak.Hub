@@ -3,6 +3,12 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- Performance: preconnect to critical origins -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="https://meet.google.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
   <title>Skillak — منصة التعليم المباشر</title>
   <meta name="description" content="تعلّم أي مهارة من معلم حقيقي عبر جلسة فيديو مباشرة — Skillak منصة التعليم الذكي" />
@@ -129,7 +135,9 @@
     .skl-ann-media {
       width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#0d6e75,#1e3a5f);
       overflow:hidden; position:relative; display:flex; align-items:center; justify-content:center;
+      min-height:120px;
     }
+    .skl-ann-media-img { width:100% !important; height:100% !important; object-fit:cover !important; display:block !important; }
     .skl-ann-media.is-fallback::after { content:'📢'; font-size:2.2rem; opacity:.6; }
     .skl-ann-media-img { width:100%; height:100%; object-fit:cover; display:block; }
 
@@ -145,15 +153,16 @@
 
     /* ── Floating session timer ── */
     #skillakFloatTimer {
-      position:fixed; bottom:clamp(14px,3vw,24px); right:clamp(12px,3vw,20px);
-      z-index:8888; display:none;
-      background:rgba(10,22,40,.92); color:#fff;
-      border:1px solid rgba(94,234,212,.3); border-radius:16px;
-      padding:10px 16px; font-family:'Cairo',sans-serif;
-      box-shadow:0 4px 24px rgba(0,0,0,.45);
-      backdrop-filter:blur(12px); direction:rtl;
-      min-width:170px; cursor:default;
-      animation:ftSlideIn .3s ease;
+      position:fixed; bottom:24px; right:20px;
+      z-index:99999; display:none;
+      background:rgba(8,18,32,.95); color:#fff;
+      border:1px solid rgba(94,234,212,.35); border-radius:18px;
+      padding:12px 18px; font-family:'Cairo',sans-serif;
+      box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(94,234,212,.1);
+      backdrop-filter:blur(16px); direction:rtl;
+      min-width:180px; touch-action:none;
+      animation:ftSlideIn .3s cubic-bezier(.34,1.56,.64,1);
+      user-select:none; -webkit-user-select:none;
     }
     @keyframes ftSlideIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
     #skillakFloatTimer .ft-label { font-size:.7rem; opacity:.55; margin-bottom:2px; }
@@ -724,7 +733,7 @@
       <div class="sestimer" id="sesTimer" style="display:none">00:00:00</div>
       <div id="sesCountdown" class="ses-countdown" style="display:none"></div>
     </div>
-    <div class="sesmain">
+    <div class="sesmain" style="flex:1;min-height:0;display:flex;flex-direction:column;">
       <!-- Session Chat Panel -->
       <div class="seschat hidden" id="sesChatPnl">
         <div class="seschathdr">💬 دردشة الجلسة<button
@@ -737,7 +746,7 @@
       </div>
 
       <!-- Google Meet main panel — meet-session.js fills #waitOv with the Meet UI -->
-      <div id="remWrap" style="position:relative;flex:1;background:#0d1117;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <div id="remWrap" style="position:relative;flex:1;min-height:0;background:#0d1117;display:flex;align-items:center;justify-content:center;overflow:hidden">
         <!-- Hidden legacy video elements — kept for compatibility, not displayed -->
         <video id="remVid" autoplay playsinline style="display:none"></video>
 
@@ -1686,12 +1695,12 @@
 
     <!-- Content -->
     <div id="sklStoryContent"
-      style="width:min(420px,92vw);max-height:88vh;overflow-y:auto;border-radius:18px;overflow:hidden"></div>
+      style="width:min(680px,98vw);max-height:96vh;overflow-y:auto;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)"></div>
   </div>
 
   <style>
     .skl-story-shell { display:flex; flex-direction:column; background:#111; color:#fff; border-radius:18px; overflow:hidden; }
-    .skl-story-media { width:100%; aspect-ratio:16/9; background:#1a1a2e; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .skl-story-media { width:100%; aspect-ratio:unset; height:clamp(200px,45vw,380px); background:#1a1a2e; display:flex; align-items:center; justify-content:center; overflow:hidden; }
     .skl-story-media.is-fallback { background:linear-gradient(135deg,#0d6e75,#1e40af); }
     .skl-story-media.is-fallback::after { content:'📢'; font-size:3rem; }
     .skl-story-img { width:100%; height:100%; object-fit:cover; }
@@ -1709,9 +1718,9 @@
   </style>
   <!-- ═══ End Story Viewer ═══ -->
 
-  <!-- ═══ Floating Session Timer ═══ -->
-  <div id="skillakFloatTimer">
-    <div class="ft-label"><span class="ft-dot"></span> جلسة جارية</div>
+  <!-- ═══ Floating Session Timer (draggable) ═══ -->
+  <div id="skillakFloatTimer" role="status" aria-label="موقت الجلسة">
+    <div class="ft-label"><span class="ft-dot"></span> <span id="skillakFloatName">جلسة جارية</span></div>
     <div class="ft-time" id="skillakFloatTime">00:00:00</div>
     <div class="ft-sub" id="skillakFloatSub">الوقت المتبقي</div>
   </div>
