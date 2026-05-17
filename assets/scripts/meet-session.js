@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
    meet-session.js  v9.0 — Skillak × Google Meet (Embedded)
-   - Meet embedded in iframe INSIDE the platform
+   - Meet opens in new tab (Google blocks iframe embedding)
    - Draggable floating timer
    - Firestore-synced timer (same for both users)
    - Session persistence across enter/exit
@@ -128,6 +128,18 @@
   /* ══════════════════════════════════════
      RENDER PANEL — Google Meet Embedded
   ══════════════════════════════════════ */
+  window._smOpenMeet = function() {
+    if (window._smUri) window.open(window._smUri, 'skillak_meet', 'noopener,noreferrer');
+  };
+  window._smCopyLink = function() {
+    var uri = window._smUri; if (!uri) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(uri).then(function(){ toast('✅ تم نسخ الرابط','suc'); }).catch(function(){ toast('⚠️ تعذر النسخ','err'); });
+    } else {
+      try { var ta=document.createElement('textarea'); ta.value=uri; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('✅ تم نسخ الرابط','suc'); } catch(_) { toast('⚠️ تعذر النسخ','err'); }
+    }
+  };
+
   function renderPanel(bk, meeting, isTutor) {
     window._smUri = meeting.uri || '';
     var waitOv = $('waitOv');
@@ -138,75 +150,56 @@
       var w=el.closest?el.closest('.cwrap'):null; if(w) w.style.display='none';
     });
 
-    var sesTxt = $('sesTxt'); var sesDot = $('sesDot');
-    var hasLink = !!meeting.uri;
-    var other = isTutor ? (bk.studentName||'الطالب') : (bk.tutorName||'المعلم');
-    var initial = (other[0]||'?').toUpperCase();
-    var endsAtMs = Number(meeting.endsAtMs||0);
-    var countdown = fmtTime(Math.max(0, endsAtMs - Date.now()));
+    var sesTxt=$('sesTxt'), sesDot=$('sesDot');
+    var hasLink=!!meeting.uri;
+    var other=isTutor?(bk.studentName||'الطالب'):(bk.tutorName||'المعلم');
+    var initial=(other[0]||'?').toUpperCase();
+    var endsAtMs=Number(meeting.endsAtMs||0);
+    var countdown=fmtTime(Math.max(0, endsAtMs-Date.now()));
 
-    if (sesTxt) sesTxt.textContent = hasLink ? 'رابط الجلسة جاهز' : 'جارٍ تجهيز الجلسة...';
-    if (sesDot) sesDot.style.background = 'var(--green,#22c55e)';
-
+    if (sesTxt) sesTxt.textContent = hasLink?'رابط الجلسة جاهز':'جارٍ تجهيز الجلسة...';
+    if (sesDot) sesDot.style.background='#22c55e';
     if (!waitOv) return;
     waitOv.classList.remove('hidden');
-    waitOv.style.cssText = 'position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;'+
-      'align-items:stretch;justify-content:stretch;overflow:hidden;'+
-      'background:linear-gradient(160deg,#0a1628 0%,#0d2137 55%,#071a14 100%)';
+    waitOv.style.cssText=[
+      'position:absolute','inset:0','z-index:20',
+      'display:flex','align-items:center','justify-content:center',
+      'overflow-y:auto','padding:clamp(16px,4vw,40px)',
+      'background:linear-gradient(160deg,#0a1628 0%,#0d2137 55%,#071a14 100%)'
+    ].join(';');
+
+    var BADGE='<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:6px 16px 6px 10px;margin-bottom:22px"><svg width="20" height="20" viewBox="0 0 48 48" fill="none"><path d="M29 24c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5 5 2.24 5 5z" fill="#4fc3f7"/><path d="M34 17l-5 4v6l5 4V17z" fill="#4fc3f7"/></svg><span style="font-size:.85rem;font-weight:700">Google Meet</span></div>';
 
     if (hasLink) {
-      /* ── EMBEDDED MEET (iframe fills screen) ── */
-      waitOv.innerHTML =
-        '<div id="smMeetWrap" style="position:relative;flex:1;display:flex;flex-direction:column;min-height:0">'+
-          '<div id="smTopBar" style="display:flex;align-items:center;gap:10px;padding:8px 14px;'+
-            'background:rgba(0,0,0,.5);backdrop-filter:blur(8px);flex-shrink:0;direction:rtl;'+
-            'border-bottom:1px solid rgba(255,255,255,.08)">'+
-            '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0d6e75,#14b8a6);'+
-              'display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff;flex-shrink:0">'+
-              esc(initial)+'</div>'+
-            '<div style="flex:1;min-width:0">'+
-              '<div style="font-weight:700;font-size:.88rem;color:#fff;font-family:Cairo,sans-serif">'+esc(other)+'</div>'+
-              '<div style="font-size:.73rem;color:rgba(255,255,255,.5);font-family:Cairo,sans-serif">'+
-                (isTutor?'الطالب':'المعلم')+'</div>'+
-            '</div>'+
-            '<div style="text-align:center">'+
-              '<div id="smCountdown" style="font-size:1rem;font-weight:900;color:#5eead4;'+
-                'font-variant-numeric:tabular-nums;font-family:Fraunces,serif">'+countdown+'</div>'+
-              '<div style="font-size:.65rem;color:rgba(255,255,255,.4);font-family:Cairo,sans-serif">متبقي</div>'+
-            '</div>'+
-            '<a href="'+esc(meeting.uri)+'" target="_blank" rel="noopener noreferrer" '+
-              'style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);'+
-              'color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:10px;'+
-              'padding:6px 12px;font-size:.78rem;font-family:Cairo,sans-serif;text-decoration:none;flex-shrink:0">'+
-              '↗ فتح خارجي</a>'+
-          '</div>'+
-          '<iframe id="smMeetIframe" src="'+esc(meeting.uri)+'" '+
-            'allow="camera;microphone;display-capture;fullscreen;autoplay;clipboard-write;encrypted-media;picture-in-picture" '+
-            'allowfullscreen style="flex:1;border:none;min-height:0;width:100%;display:block">'+
-          '</iframe>'+
-        '</div>';
+      waitOv.innerHTML=[
+        '<div style="width:min(100%,500px);display:flex;flex-direction:column;align-items:center;text-align:center;font-family:Cairo,sans-serif;color:#fff">',
+        BADGE,
+        '<div style="width:clamp(56px,12vw,72px);height:clamp(56px,12vw,72px);border-radius:50%;background:linear-gradient(135deg,#0d6e75,#14b8a6);display:flex;align-items:center;justify-content:center;font-size:clamp(1.4rem,4vw,1.8rem);font-weight:900;margin-bottom:10px;box-shadow:0 4px 20px rgba(20,184,166,.4)">'+esc(initial)+'</div>',
+        '<div style="font-size:clamp(.95rem,2.5vw,1.1rem);font-weight:700;margin-bottom:3px">'+esc(other)+'</div>',
+        '<div style="font-size:.8rem;opacity:.5;margin-bottom:20px">'+(isTutor?'الطالب':'المعلم')+'</div>',
+        '<div style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:clamp(12px,3vw,18px) clamp(14px,4vw,22px);margin-bottom:20px;display:grid;gap:12px;text-align:right">',
+          '<div style="display:flex;justify-content:space-between;align-items:center;font-size:clamp(.8rem,2.2vw,.9rem)"><strong style="color:#5eead4">● رابط الجلسة جاهز</strong><span style="opacity:.5;font-size:.78rem">الحالة</span></div>',
+          '<div style="height:1px;background:rgba(255,255,255,.07)"></div>',
+          '<div style="display:flex;justify-content:space-between;align-items:center;font-size:clamp(.8rem,2.2vw,.9rem)"><strong id="smCountdown" style="color:#fbbf24;font-variant-numeric:tabular-nums">'+countdown+'</strong><span style="opacity:.5;font-size:.78rem">الوقت المتبقي</span></div>',
+        '</div>',
+        '<div style="display:flex;gap:10px;width:100%;margin-bottom:14px;flex-wrap:wrap">',
+          '<button onclick="window._smOpenMeet()" style="flex:2;min-width:140px;padding:clamp(12px,3vw,15px) 20px;background:linear-gradient(135deg,#0d6e75,#0891b2);color:#fff;border:none;border-radius:14px;font-size:clamp(.9rem,2.5vw,1rem);font-weight:700;cursor:pointer;font-family:Cairo,sans-serif;box-shadow:0 4px 18px rgba(13,110,117,.5)">📹 فتح Google Meet</button>',
+          '<button onclick="window._smCopyLink()" style="flex:1;min-width:100px;padding:clamp(12px,3vw,15px) 14px;background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:14px;font-size:clamp(.82rem,2.2vw,.92rem);font-weight:600;cursor:pointer;font-family:Cairo,sans-serif">🔗 نسخ</button>',
+        '</div>',
+        '<p style="font-size:.75rem;opacity:.4;line-height:1.75;margin:0">Google Meet يفتح في تبويب جديد — يمكنك العودة للمنصة في أي وقت وستجد الجلسة جارية والموقت يعمل.</p>',
+        '</div>'
+      ].join('');
     } else {
-      /* ── LOADING STATE ── */
-      waitOv.innerHTML =
-        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;'+
-          'flex:1;gap:16px;font-family:Cairo,sans-serif;color:#fff;text-align:center;padding:24px">'+
-          '<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);'+
-            'border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:7px 18px 7px 12px">'+
-            '<svg width="20" height="20" viewBox="0 0 48 48" fill="none">'+
-              '<path d="M29 24c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5 5 2.24 5 5z" fill="#4fc3f7"/>'+
-              '<path d="M34 17l-5 4v6l5 4V17z" fill="#4fc3f7"/>'+
-            '</svg>'+
-            '<span style="font-size:.88rem;font-weight:700">Google Meet</span>'+
-          '</div>'+
-          '<div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0d6e75,#14b8a6);'+
-            'display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900">'+
-            esc(initial)+'</div>'+
-          '<div style="font-size:1.05rem;font-weight:700">'+esc(other)+'</div>'+
-          '<div style="font-size:.82rem;opacity:.6">جارٍ إنشاء رابط Google Meet...</div>'+
-          '<div style="width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.15);'+
-            'border-top-color:#5eead4;animation:spin 1s linear infinite"></div>'+
-          '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>'+
-        '</div>';
+      waitOv.innerHTML=[
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:Cairo,sans-serif;color:#fff;text-align:center;padding:24px">',
+        BADGE,
+        '<div style="width:clamp(56px,12vw,72px);height:clamp(56px,12vw,72px);border-radius:50%;background:linear-gradient(135deg,#0d6e75,#14b8a6);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900">'+esc(initial)+'</div>',
+        '<div style="font-size:1.05rem;font-weight:700">'+esc(other)+'</div>',
+        '<div style="font-size:.82rem;opacity:.6">جارٍ إنشاء رابط Google Meet...</div>',
+        '<div style="width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:#5eead4;animation:spin 1s linear infinite"></div>',
+        '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>',
+        '</div>'
+      ].join('');
     }
   }
 
@@ -360,12 +353,18 @@
     window.unreadSes=0;
     cleanup();
 
-    // Render with real link (embedded iframe)
+    // Render panel with Meet link
     renderPanel(window.curSesBk, meeting, isTutor);
     startCountdown(endsAtMs, bookingId, isTutor, other);
     if(typeof loadSesChat==='function') loadSesChat(bookingId);
 
-    toast('✅ جلسة Google Meet جاهزة — تفاعل مع النافذة للسماح بالكاميرا','suc');
+    toast('✅ جلسة Google Meet جاهزة — يفتح الآن...','suc');
+    // Auto-open Meet immediately after link is ready
+    if (meeting.uri) {
+      setTimeout(function() {
+        try { window.open(meeting.uri, 'skillak_meet', 'noopener,noreferrer'); } catch(_) {}
+      }, 400);
+    }
   }
 
   window.enterSession = async function(bookingId) {
@@ -409,8 +408,7 @@
       }
     }
 
-    // Remove iframe to stop camera/mic
-    var iframe=$('smMeetIframe'); if(iframe){iframe.src='about:blank';iframe.remove();}
+
     var waitOv=$('waitOv'); if(waitOv){waitOv.classList.add('hidden');waitOv.style.display='none';}
     var mainNav=$('mainNav'); if(mainNav) mainNav.style.display='';
 
@@ -429,7 +427,7 @@
     if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null;}
     hideFloatTimer();
     cleanup();
-    var iframe=$('smMeetIframe'); if(iframe){iframe.src='about:blank';iframe.remove();}
+
     if(_db){
       await _db.collection('bookings').doc(bid).set({status:'paused',meetingStatus:'paused',
         lastPausedAt:firebase.firestore.FieldValue.serverTimestamp(),pausedBy:_CU?_CU.uid:null},{merge:true}).catch(function(){});

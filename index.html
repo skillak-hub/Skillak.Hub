@@ -1668,48 +1668,54 @@
 
   <!-- ═══ Story / Announcement Viewer ═══ -->
   <div id="sklStoryViewer" style="display:none;position:fixed;inset:0;z-index:9999;
-    background:rgba(0,0,0,.88);backdrop-filter:blur(6px);
-    align-items:center;justify-content:center;direction:rtl">
-
-    <!-- Close -->
-    <button onclick="window.sklCloseStory()" aria-label="إغلاق"
-      style="position:absolute;top:16px;left:16px;background:rgba(255,255,255,.15);
-      border:none;color:#fff;width:38px;height:38px;border-radius:50%;
-      font-size:1.1rem;cursor:pointer;z-index:10">✕</button>
+    background:rgba(0,0,0,.92);backdrop-filter:blur(8px);
+    align-items:flex-start;justify-content:center;direction:rtl;overflow-y:auto">
 
     <!-- Progress bar -->
     <div id="sklStoryProg"
-      style="position:absolute;top:0;left:0;right:0;height:3px;display:flex;gap:3px;padding:0 12px;box-sizing:border-box;z-index:10"></div>
+      style="position:fixed;top:0;left:0;right:0;height:3px;display:flex;gap:3px;padding:0 12px;box-sizing:border-box;z-index:10010"></div>
+
+    <!-- Close -->
+    <button onclick="window.sklCloseStory()" aria-label="إغلاق"
+      style="position:fixed;top:12px;left:12px;background:rgba(0,0,0,.6);
+      border:1px solid rgba(255,255,255,.2);color:#fff;width:38px;height:38px;border-radius:50%;
+      font-size:1.1rem;cursor:pointer;z-index:10010;backdrop-filter:blur(4px)">✕</button>
 
     <!-- Nav: previous -->
     <button onclick="window.sklStoryNav(-1)" aria-label="السابق"
-      style="position:absolute;right:8px;top:50%;transform:translateY(-50%);
-      background:rgba(255,255,255,.12);border:none;color:#fff;width:40px;height:40px;
-      border-radius:50%;font-size:1.2rem;cursor:pointer;z-index:10">›</button>
+      style="position:fixed;right:8px;top:50%;transform:translateY(-50%);
+      background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);color:#fff;width:40px;height:40px;
+      border-radius:50%;font-size:1.4rem;cursor:pointer;z-index:10010;backdrop-filter:blur(4px)">›</button>
 
     <!-- Nav: next -->
     <button onclick="window.sklStoryNav(1)" aria-label="التالي"
-      style="position:absolute;left:8px;top:50%;transform:translateY(-50%);
-      background:rgba(255,255,255,.12);border:none;color:#fff;width:40px;height:40px;
-      border-radius:50%;font-size:1.2rem;cursor:pointer;z-index:10">‹</button>
+      style="position:fixed;left:8px;top:50%;transform:translateY(-50%);
+      background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);color:#fff;width:40px;height:40px;
+      border-radius:50%;font-size:1.4rem;cursor:pointer;z-index:10010;backdrop-filter:blur(4px)">‹</button>
 
-    <!-- Content -->
+    <!-- Content — full width on mobile -->
     <div id="sklStoryContent"
-      style="width:min(680px,98vw);max-height:96vh;overflow-y:auto;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)"></div>
+      style="width:min(700px,100vw);min-height:100vh;box-sizing:border-box;
+      border-radius:0;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px)"></div>
   </div>
 
   <style>
-    .skl-story-shell { display:flex; flex-direction:column; background:#111; color:#fff; border-radius:18px; overflow:hidden; }
-    .skl-story-media { width:100%; aspect-ratio:unset; height:clamp(200px,45vw,380px); background:#1a1a2e; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .skl-story-shell { display:flex; flex-direction:column; background:#0d1117; color:#fff; min-height:100vh; }
+    .skl-story-media {
+      width:100%; aspect-ratio:unset;
+      height:clamp(220px,56vw,520px);
+      background:#1a1a2e; display:flex; align-items:center; justify-content:center; overflow:hidden;
+      position:relative;
+    }
     .skl-story-media.is-fallback { background:linear-gradient(135deg,#0d6e75,#1e40af); }
     .skl-story-media.is-fallback::after { content:'📢'; font-size:3rem; }
-    .skl-story-img { width:100%; height:100%; object-fit:cover; }
-    .skl-story-body { padding:18px 16px 20px; }
+    .skl-story-img { width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0; }
+    .skl-story-body { padding:clamp(16px,4vw,28px) clamp(16px,4vw,28px) clamp(24px,6vw,40px); }
     .skl-story-meta { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
     .skl-story-chip { background:rgba(255,255,255,.15); color:#fff; font-size:.75rem; padding:3px 10px; border-radius:100px; }
     .skl-story-date { font-size:.75rem; color:rgba(255,255,255,.5); }
-    .skl-story-title { font-size:1.15rem; font-weight:700; margin:0 0 8px; line-height:1.4; }
-    .skl-story-text { font-size:.88rem; line-height:1.7; color:rgba(255,255,255,.8); margin-bottom:14px; white-space:pre-wrap; }
+    .skl-story-title { font-size:clamp(1.1rem,3vw,1.4rem); font-weight:700; margin:0 0 10px; line-height:1.4; }
+    .skl-story-text { font-size:clamp(.88rem,2.2vw,1rem); line-height:1.75; color:rgba(255,255,255,.8); margin-bottom:18px; white-space:pre-wrap; }
     .skl-story-link { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); color:#fff; padding:9px 18px; border-radius:10px; font-size:.88rem; text-decoration:none; font-weight:600; }
     .skl-story-link:hover { background:rgba(255,255,255,.22); }
     .skl-story-seg { flex:1; height:3px; border-radius:2px; background:rgba(255,255,255,.25); transition:background .2s; }
