@@ -945,7 +945,7 @@
 
     /* How */
     .how {
-      background: #212731;
+      background: var(--ink);
     }
 
     .how .st {
@@ -959,10 +959,11 @@
     }
 
     .step {
-      padding: 24px;
+      padding: clamp(16px,3vw,24px);
       border-radius: var(--r);
-      border: 1px solid rgba(255, 255, 255, .07);
-      background: rgba(255, 255, 255, .032);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.035);
+      transition: background .2s, transform .2s;
     }
 
     .step:hover {
@@ -971,9 +972,9 @@
 
     .stepn {
       font-family: 'Fraunces', serif;
-      font-size: 2.6rem;
+      font-size: clamp(2rem,5vw,2.6rem);
       font-weight: 900;
-      color: rgba(245, 158, 11, .2);
+      color: rgba(245,158,11,.25);
       line-height: 1;
       margin-bottom: 11px;
     }
@@ -7088,61 +7089,177 @@ footer a:hover { color: #f97316 !important; }
 }
 
 /* ══ 30. DARK MODE  ══ */
+/* ══════════════════════════════════════════════════════
+   LIGHT MODE — explicit (default is light)
+   Ensures readable colors on light background
+══════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: light) {
+  :root {
+    --page-bg:  #f5f7fa;
+    --card-bg:  #ffffff;
+    --card-bg2: #f0f4f8;
+    --ink:      #111827;
+    --ink2:     #374151;
+    --muted:    #6b7280;
+    --border:   #e2e8f0;
+    --white:    #ffffff;
+    --cream:    #f5f7fa;
+    --cream2:   #eef2f7;
+    --cream3:   #e4eaf2;
+    --teal3:    #e0f2f4;
+    --teal4:    #b2dfe2;
+    --amber3:   #fef3c7;
+    --red2:     #fee2e2;
+    --green2:   #d1fae5;
+  }
+
+  body { background: var(--page-bg); color: var(--ink); }
+
+  /* Steps section — force dark background for readability */
+  .steps-section { background: linear-gradient(160deg,#0d1b35,#0a1628) !important; }
+  .step { background: rgba(255,255,255,.05) !important; border-color: rgba(255,255,255,.1) !important; }
+  .steptitle { color: #ffffff !important; }
+  .stepdesc  { color: rgba(255,255,255,.6) !important; }
+
+  /* Cards */
+  .card { background: #ffffff !important; border-color: var(--border) !important; color: var(--ink) !important; }
+  .ch   { background: #f8fafc !important; border-color: var(--border) !important; color: var(--ink) !important; }
+  .cb   { background: #ffffff !important; color: var(--ink) !important; }
+
+  /* Forms */
+  input, textarea, select {
+    background: #ffffff !important;
+    border-color: #d1d5db !important;
+    color: #111827 !important;
+  }
+  input::placeholder, textarea::placeholder { color: #9ca3af !important; }
+
+  /* Modal */
+  .modal { background: #ffffff !important; border-color: var(--border) !important; }
+  .mi    { background: #ffffff !important; }
+
+  /* Tags */
+  .tag   { background: #e0f2f4 !important; color: #0d6e75 !important; }
+  .tag-g { background: #d1fae5 !important; color: #065f46 !important; }
+  .tag-a { background: #fef3c7 !important; color: #92400e !important; }
+  .tag-r { background: #fee2e2 !important; color: #b91c1c !important; }
+
+  /* Booking cards */
+  .bkcard { background: #ffffff !important; border-color: var(--border) !important; }
+  .bkcard-title { color: var(--ink) !important; }
+  .bkcard-sub   { color: var(--muted) !important; }
+
+  /* Status badges */
+  .pco { background: #dbeafe !important; color: #1e40af !important; }
+  .pp  { background: #fef3c7 !important; color: #92400e !important; }
+  .pc  { background: #d1fae5 !important; color: #065f46 !important; }
+  .pca { background: #fee2e2 !important; color: #b91c1c !important; }
+
+  /* Chat */
+  .chatmsgs { background: #f8fafc !important; }
+  .chatmsg-wrap.mine .chatmsg { background: #0d6e75 !important; color: #fff !important; }
+  .chatmsg { background: #e2e8f0 !important; color: #111827 !important; }
+
+  /* Profile page */
+  .profsec { background: #ffffff !important; border-color: var(--border) !important; }
+
+  /* Bottom nav */
+  .bottom-nav { background: rgba(255,255,255,.96) !important; border-color: var(--border) !important; }
+  .bnav-lbl   { color: var(--muted) !important; }
+  .bnav-item.active .bnav-lbl { color: #0d6e75 !important; }
+}
+
+/* ══════════════════════════════════════════════════════
+   DARK MODE — full override
+══════════════════════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --cream:  #0d1b35;
-    --cream2: #112040;
-    --cream3: #152850;
-    --border: #1e3a6e;
-    --ink:    #e8eef8;
-    --muted:  #7a95c0;
-    --white:  #111f3c;
-    --teal3:  #0d2355;
-    --teal4:  #163680;
-    --amber3: #2a1505;
+    --page-bg:  #080f1f;
+    --card-bg:  #0e1a30;
+    --card-bg2: #122040;
+    --ink:      #e8edf8;
+    --ink2:     #b8c8e8;
+    --muted:    #7a90b8;
+    --border:   #1a2f55;
+    --white:    #0e1a30;
+    --cream:    #080f1f;
+    --cream2:   #0e1a30;
+    --cream3:   #122040;
+    --teal3:    #0d2040;
+    --teal4:    #153060;
+    --amber3:   #1f1200;
+    --red2:     #2a0808;
+    --green2:   #062015;
   }
 
-  body { background: #0a1628; }
+  body { background: #080f1f; color: #e8edf8; }
 
+  /* Navbar */
   .navbar {
-    background: linear-gradient(135deg, #060f23 0%, #0d2355 60%, #112a6b 100%) !important;
-    border-bottom-color: rgba(255,255,255,.07) !important;
+    background: linear-gradient(135deg,#050c1c 0%,#0a1835 60%,#0d2050 100%) !important;
+    border-bottom-color: rgba(255,255,255,.06) !important;
   }
+  .mob-menu { background: linear-gradient(160deg,#050c1c 0%,#0a1835 100%) !important; }
 
-  .mob-menu {
-    background: linear-gradient(160deg, #060f23 0%, #0d2355 100%) !important;
-  }
+  /* Cards */
+  .card { background: #0e1a30 !important; border-color: #1a2f55 !important; }
+  .ch   { background: #0a1628 !important; border-color: #1a2f55 !important; }
+  .cb   { background: #0e1a30 !important; }
 
-  .card {
-    background: #111f3c !important;
-    border-color: #1e3a6e !important;
-  }
-
-  .ch { background: #0d1b35 !important; border-color: #1e3a6e !important; }
-
+  /* Forms */
   input, textarea, select {
-    background: #0d1b35 !important;
-    border-color: #000000  !important;
-    color: #000000 !important;
+    background: #0a1628 !important;
+    border-color: #1a2f55 !important;
+    color: #e8edf8 !important;
   }
+  input::placeholder, textarea::placeholder { color: #5a7090 !important; }
 
-  .modal {
-    background: #111f3c !important;
-    border-color: rgba(21,101,192,.25) !important;
-  }
+  /* Modal */
+  .modal { background: #0e1a30 !important; border-color: rgba(30,70,140,.4) !important; }
+  .mi    { background: #0e1a30 !important; }
 
-  .hero {
-    background: linear-gradient(160deg, #03081a 0%, #071335 45%, #0a1a48 100%) !important;
-  }
+  /* Tags */
+  .tag   { background: #0d2040 !important; color: #5eead4 !important; }
+  .tag-g { background: #062015 !important; color: #6ee7b7 !important; }
+  .tag-a { background: #1f1200 !important; color: #fbbf24 !important; }
+  .tag-r { background: #2a0808 !important; color: #fca5a5 !important; }
 
+  /* Steps */
+  .step { background: rgba(255,255,255,.04) !important; border-color: rgba(255,255,255,.08) !important; }
+  .steptitle { color: #ffffff !important; }
+  .stepdesc  { color: rgba(255,255,255,.5) !important; }
+
+  /* Booking cards */
+  .bkcard { background: #0e1a30 !important; border-color: #1a2f55 !important; }
+  .bkcard-title { color: #e8edf8 !important; }
+  .bkcard-sub   { color: #7a90b8 !important; }
+
+  /* Status */
+  .pco { background: #0d2040 !important; color: #93c5fd !important; }
+  .pp  { background: #1f1200 !important; color: #fbbf24 !important; }
+  .pc  { background: #062015 !important; color: #6ee7b7 !important; }
+  .pca { background: #2a0808 !important; color: #fca5a5 !important; }
+
+  /* Chat */
+  .chatmsgs { background: #060e1c !important; }
+  .chatmsg-wrap.mine .chatmsg { background: #0d6e75 !important; color: #fff !important; }
+  .chatmsg { background: #122040 !important; color: #e8edf8 !important; }
+
+  /* Profile */
+  .profsec { background: #0e1a30 !important; border-color: #1a2f55 !important; }
+
+  /* Hero */
+  .hero { background: linear-gradient(160deg,#03081a 0%,#071335 45%,#0a1a48 100%) !important; }
+
+  /* Footer / Bottom nav */
+  footer { background: linear-gradient(160deg,#03081a 0%,#071335 100%) !important; }
   .bottom-nav {
-    background: linear-gradient(180deg, #060f23 0%, #030c1a 100%) !important;
+    background: rgba(5,12,28,.96) !important;
+    border-color: rgba(255,255,255,.06) !important;
   }
 
-  footer { background: linear-gradient(160deg, #03081a 0%, #071335 100%) !important; }
-
-  .tag { background: #112a6b !important; }
-  .pco { background: #0d2355 !important; }
+  /* Misc */
+  #page-dashboard { background: #080f1f !important; }
 }
 
 /* ══ 31. تنسيق الـ Scroll bar ══ */
@@ -9041,3 +9158,47 @@ footer::before{
 }
 
 /* ===== END ultimate_v6.css ===== */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SKILLAK BRAND — MASTER OVERRIDE
+   Skill = #fff always | ak = #f97316 always
+   Covers: .ll, .logo, .seslogo, .swr-logo, .skl-splash-name
+═══════════════════════════════════════════════════════════════ */
+
+/* Base color for the word "Skill" */
+.ll,
+.logo,
+.seslogo,
+.swr-logo,
+.skl-splash-name {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* "ak" span — always orange */
+.ll span,
+.logo span,
+.seslogo span,
+.swr-logo span,
+.skl-splash-name span {
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+}
+
+/* Dark backgrounds where logo sits — no change needed */
+.navbar .logo,
+footer .logo,
+footer .ll {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.navbar .logo span,
+footer .logo span,
+footer .ll span {
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+}

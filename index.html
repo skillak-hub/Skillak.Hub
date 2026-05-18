@@ -175,6 +175,82 @@
     #skillakFloatTimer .ft-dot   { display:inline-block; width:7px; height:7px; border-radius:50%; background:#22c55e; margin-left:5px; animation:ftPulse 1.6s ease-in-out infinite; }
     @keyframes ftPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
   </style>
+
+  <style id="skillak-steps-force">
+    /* Steps section always dark — readable in both light and dark mode */
+    .steps-section {
+      background: linear-gradient(160deg, #0a1628 0%, #0d2137 60%, #071a14 100%) !important;
+    }
+    .steps-section .sh .st { color: #ffffff !important; }
+    .steps-section .step { background: rgba(255,255,255,.05) !important; border-color: rgba(255,255,255,.1) !important; }
+    .steps-section .steptitle { color: #ffffff !important; }
+    .steps-section .stepdesc { color: rgba(255,255,255,.6) !important; }
+    .steps-section .stepn { color: rgba(245,158,11,.3) !important; }
+
+    /* General light mode readability fixes */
+    @media (prefers-color-scheme: light) {
+      /* Text on light backgrounds */
+      .card .ct, .card .fh, .bkcard .bkcard-title { color: #111827 !important; }
+      .card p, .card label, .card .cb p { color: #374151 !important; }
+      
+      /* Form labels */
+      label { color: #374151 !important; }
+      
+      /* Tutor cards in explore */
+      .tc { background: #ffffff !important; border-color: #e2e8f0 !important; }
+      .tc .tname { color: #111827 !important; }
+      .tc .tspec { color: #6b7280 !important; }
+      
+      /* Dashboard stats */
+      .stat-card { background: #ffffff !important; }
+      .stat-val { color: #111827 !important; }
+      .stat-lbl { color: #6b7280 !important; }
+
+      /* Session cards */
+      .ses-card { background: #ffffff !important; border-color: #e2e8f0 !important; }
+    }
+
+    /* Mobile responsive improvements */
+    @media (max-width: 640px) {
+      .steps { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+      .step { padding: 16px 12px !important; }
+      .stepn { font-size: 1.8rem !important; }
+      .stepic { font-size: 1.4rem !important; }
+      .steptitle { font-size: .82rem !important; }
+      .stepdesc { font-size: .74rem !important; }
+    }
+    @media (max-width: 380px) {
+      .steps { grid-template-columns: 1fr !important; }
+    }
+
+    /* Announcement cards full width on mobile */
+    @media (max-width: 600px) {
+      .skl-ann-track { padding: 6px 10px 14px !important; }
+      .skl-ann-card { flex: 0 0 calc(100vw - 32px) !important; }
+    }
+  </style>
+
+  <style id="skillak-pass-strength-css">
+    .pass-req {
+      font-size: .72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      background: var(--cream2);
+      transition: all .2s;
+    }
+    .pass-req.ok {
+      color: #065f46;
+      background: #d1fae5;
+    }
+    @media (prefers-color-scheme: dark) {
+      .pass-req { background: rgba(255,255,255,.06); color: #7a90b8; }
+      .pass-req.ok { background: #062015; color: #6ee7b7; }
+    }
+  </style>
 </head>
 
 <body>
@@ -289,7 +365,7 @@
         <div>
           <div class="htag">✦ <span id="hTagCnt">—</span> معلم متخصص نشط</div>
           <h1 class="htitle">تعلّم أي مهارة<br />من شخص <em>حقيقي</em><br />في وقتك أنت</h1>
-          <p class="hsub">Skillak يربطك بمدرّسين متخصصين عبر جلسات فيديو مباشرة. احجز بالساعة، تواصل بالشات، وادفع
+          <p class="hsub"><span style="color:#fff;font-weight:700">Skill<span style="color:#f97316">ak</span></span> يربطك بمدرّسين متخصصين عبر جلسات فيديو مباشرة. احجز بالساعة، تواصل بالشات، وادفع
             آمناً.</p>
           <div class="hsearch">
             <input type="text" id="heroSrch" placeholder="ابحث: Python، تصميم، Excel، إنجليزي..." />
@@ -373,7 +449,7 @@
       </div>
     </section></div>
 
-    <section class="how">
+    <section class="steps-section how">
       <div class="sh center"><span class="sl" style="color:var(--amber)">كيف تعمل المنصة</span>
         <h2 class="st" style="color:#fff">خمس خطوات <span style="color:var(--amber)">بسيطة</span></h2>
       </div>
@@ -454,8 +530,9 @@
 
     <section class="cta">
       <span class="sl">ابدأ اليوم</span>
-      <h2 class="st" style="color:#fff;margin:10px 0">جاهز تبدأ رحلتك <span style="color:var(--amber)">مع
-          Skillak؟</span></h2>
+      <h2 class="st" style="color:#fff;margin:10px 0">جاهز تبدأ رحلتك مع
+        <span style="white-space:nowrap"><span style="color:#fff!important">Skill</span><span style="color:#f97316!important">ak</span></span>؟
+      </h2>
       <p class="ctasub">انضم لأكثر من 18,000 شخص يتعلمون ويعلّمون مهاراتهم كل يوم.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
         <button class="btn btn-a" onclick="openM('regMod')">ابدأ كمتعلم — مجاناً</button>
@@ -1331,6 +1408,24 @@
             </div>
           </div>
           <button class="btn btn-p" style="width:100%" onclick="gRS(2)">التالي ←</button>
+
+          <!-- Google Sign-Up -->
+          <div style="display:flex;align-items:center;gap:10px;margin:12px 0 4px">
+            <div style="flex:1;height:1px;background:var(--border)"></div>
+            <span style="font-size:.78rem;color:var(--muted);white-space:nowrap">أو أنشئ حساباً بـ</span>
+            <div style="flex:1;height:1px;background:var(--border)"></div>
+          </div>
+          <button id="regGoogleBtn" onclick="doGoogleAuth('register')"
+            style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+            padding:12px;border-radius:12px;border:1.5px solid var(--border);background:#fff;
+            color:#3c4043;font-size:.9rem;font-weight:600;cursor:pointer;font-family:Cairo,sans-serif;
+            transition:box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.1)"
+            onmouseover="this.style.boxShadow='0 3px 12px rgba(0,0,0,.18)'"
+            onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.1)'">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.7 5.6 2.9 13.7l7.8 6.1C12.5 13.5 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 6.9-10 6.9-17.3z"/><path fill="#FBBC05" d="M10.7 28.2A14.6 14.6 0 0 1 9.5 24c0-1.5.3-2.9.7-4.2l-7.8-6.1A23.9 23.9 0 0 0 0 24c0 3.8.9 7.5 2.5 10.7l8.2-6.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.2 0-11.5-4.2-13.4-9.8l-8.2 6.5C6.5 42.5 14.7 48 24 48z"/></svg>
+            إنشاء حساب بـ Google
+          </button>
+
           <p class="asw">لديك حساب؟ <a onclick="switchM('regMod','loginMod')">سجّل الدخول</a></p>
         </div>
         <!-- Step 2: Basic Info -->
@@ -1350,8 +1445,34 @@
             <div class="fh">يمكنك رفع صورة من جهازك ثم قصّها قبل الحفظ.</div>
             <div id="r2PhotoPreview" class="photo-preview photo-preview-large hidden"></div>
           </div>
-          <div class="fg"><label>كلمة المرور <span class="req">*</span></label><input type="password" id="r2P"
-              placeholder="6 أحرف على الأقل" /></div>
+          <div class="fg">
+            <label>🔒 كلمة المرور <span class="req">*</span></label>
+            <div style="position:relative">
+              <input type="password" id="r2P" placeholder="أدخل كلمة مرور قوية"
+                oninput="checkPassStrength(this.value)"
+                style="padding-left:44px" />
+              <button type="button" onclick="togPassVis('r2P',this)"
+                style="position:absolute;left:12px;top:50%;transform:translateY(-50%);
+                background:none;border:none;cursor:pointer;color:var(--muted);font-size:.9rem;padding:4px">👁</button>
+            </div>
+            <!-- Strength bar -->
+            <div id="passStrengthBar" style="display:none;margin-top:8px">
+              <div style="display:flex;gap:4px;margin-bottom:5px">
+                <div id="psb1" style="flex:1;height:4px;border-radius:2px;background:#e5e7eb;transition:background .3s"></div>
+                <div id="psb2" style="flex:1;height:4px;border-radius:2px;background:#e5e7eb;transition:background .3s"></div>
+                <div id="psb3" style="flex:1;height:4px;border-radius:2px;background:#e5e7eb;transition:background .3s"></div>
+                <div id="psb4" style="flex:1;height:4px;border-radius:2px;background:#e5e7eb;transition:background .3s"></div>
+              </div>
+              <div id="passStrengthLabel" style="font-size:.75rem;font-weight:700"></div>
+              <!-- Requirements checklist -->
+              <div id="passReqs" style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                <div id="req-len"  class="pass-req">✗ 8 أحرف على الأقل</div>
+                <div id="req-up"   class="pass-req">✗ حرف كبير (A-Z)</div>
+                <div id="req-num"  class="pass-req">✗ رقم (0-9)</div>
+                <div id="req-sym"  class="pass-req">✗ رمز (!@#$...)</div>
+              </div>
+            </div>
+          </div>
           <div style="display:flex;gap:8px"><button class="btn btn-gh" style="flex:1" onclick="gRS(1)">←
               رجوع</button><button class="btn btn-p" style="flex:2" onclick="gRS(3)">التالي ←</button></div>
         </div>
@@ -1464,6 +1585,24 @@
             المرور؟</a></div>
         <button class="btn btn-p" style="width:100%;font-size:.96rem;padding:13px" id="liBtn" onclick="doLogin()">تسجيل
           الدخول</button>
+
+        <!-- Google Sign-In -->
+        <div style="display:flex;align-items:center;gap:10px;margin:14px 0">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:.78rem;color:var(--muted);white-space:nowrap">أو تسجيل الدخول بـ</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <button id="liGoogleBtn" onclick="doGoogleAuth('login')"
+          style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+          padding:12px;border-radius:12px;border:1.5px solid var(--border);background:#fff;
+          color:#3c4043;font-size:.94rem;font-weight:600;cursor:pointer;font-family:Cairo,sans-serif;
+          transition:box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.1)"
+          onmouseover="this.style.boxShadow='0 3px 12px rgba(0,0,0,.18)'"
+          onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.1)'">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.7 5.6 2.9 13.7l7.8 6.1C12.5 13.5 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 6.9-10 6.9-17.3z"/><path fill="#FBBC05" d="M10.7 28.2A14.6 14.6 0 0 1 9.5 24c0-1.5.3-2.9.7-4.2l-7.8-6.1A23.9 23.9 0 0 0 0 24c0 3.8.9 7.5 2.5 10.7l8.2-6.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.2 0-11.5-4.2-13.4-9.8l-8.2 6.5C6.5 42.5 14.7 48 24 48z"/></svg>
+          الدخول بحساب Google
+        </button>
+
         <p class="asw">ليس لديك حساب؟ <a onclick="switchM('loginMod','regMod')">أنشئ حساباً مجانياً</a></p>
       </div>
     </div>

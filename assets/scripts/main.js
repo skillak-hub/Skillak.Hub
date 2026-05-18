@@ -2367,7 +2367,154 @@
       go('home');
     }
 
-    async function doFgt() {
+
+    /* ════════════════════════════════════════════════════
+       GOOGLE SIGN-IN / SIGN-UP
+    ════════════════════════════════════════════════════ */
+    async function doGoogleAuth(mode) {
+      const btnId = mode === 'login' ? 'liGoogleBtn' : 'regGoogleBtn';
+      const btn = document.getElementById(btnId);
+      if (btn) { btn.disabled = true; btn.style.opacity = '.6'; }
+
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('email');
+        provider.addScope('profile');
+        provider.setCustomParameters({ prompt: 'select_account' });
+
+        const result = await auth.signInWithPopup(provider);
+        const user   = result.user;
+        const isNew  = result.additionalUserInfo && result.additionalUserInfo.isNewUser;
+
+        // Check if profile exists in Firestore
+        const snap = await db.collection('users').doc(user.uid).get();
+
+        if (!snap.exists || isNew) {
+          // New user — create profile
+          const displayName = user.displayName || '';
+          const nameParts   = displayName.split(' ');
+          const firstName   = nameParts[0] || 'مستخدم';
+          const lastName    = nameParts.slice(1).join(' ') || '';
+          const role        = (typeof regRole !== 'undefined' && regRole) ? regRole : 'learner';
+
+          const profile = {
+            uid:          user.uid,
+            email:        user.email || '',
+            name:         displayName || firstName,
+            photo:        user.photoURL || '',
+            role:         role,
+            bio:          '',
+            skills:       [],
+            price:        0,
+            lang:         'عربي',
+            country:      '',
+            category:     '',
+            rating:       0,
+            totalReviews: 0,
+            totalSessions:0,
+            isApproved:   role !== 'tutor',
+            authProvider: 'google',
+            createdAt:    firebase.firestore.FieldValue.serverTimestamp(),
+          };
+
+          const batch = db.batch();
+          batch.set(db.collection('users').doc(user.uid), profile);
+          batch.set(db.collection('wallets').doc(user.uid), { balance: 0, userId: user.uid });
+          await batch.commit();
+
+          CP = profile;
+          closeM('regMod');
+          closeM('loginMod');
+          showT('🎉 مرحباً ' + firstName + '! تم إنشاء حسابك بـ Google بنجاح.', 'suc');
+        } else {
+          // Existing user
+          CP = snap.data();
+          closeM('loginMod');
+          closeM('regMod');
+          showT('مرحباً بعودتك ' + (CP.name || '') + '! 👋', 'suc');
+        }
+
+        window.CU = user;
+        syncProfileWindow && syncProfileWindow();
+        updNavU && updNavU();
+        startMsgL && startMsgL();
+        go('dashboard');
+
+      } catch (err) {
+        const errMap = {
+          'auth/popup-closed-by-user':     'تم إغلاق نافذة Google — حاول مرة أخرى',
+          'auth/popup-blocked':            'المتصفح حجب نافذة Google — اسمح بالنوافذ المنبثقة',
+          'auth/account-exists-with-different-credential':
+            'هذا البريد مسجّل بطريقة أخرى — استخدم البريد وكلمة المرور',
+          'auth/network-request-failed':   'تحقق من اتصالك بالإنترنت',
+          'auth/cancelled-popup-request':  'طلب ملغى — حاول مرة أخرى',
+        };
+        const msg = errMap[err.code] || err.message || 'حدث خطأ أثناء تسجيل الدخول بـ Google';
+        if (document.getElementById('loginErr')) {
+          const el = document.getElementById('loginErr');
+          el.textContent = '⚠️ ' + msg; el.classList.remove('hidden');
+        } else {
+          showT(msg, 'err');
+        }
+      } finally {
+        if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+      }
+    }
+    window.doGoogleAuth = doGoogleAuth;
+
+    /* ════════════════════════════════════════════════════
+       PASSWORD STRENGTH METER
+    ════════════════════════════════════════════════════ */
+    function checkPassStrength(val) {
+      var bar     = document.getElementById('passStrengthBar');
+      var label   = document.getElementById('passStrengthLabel');
+      var b1=document.getElementById('psb1'), b2=document.getElementById('psb2'),
+          b3=document.getElementById('psb3'), b4=document.getElementById('psb4');
+      var rLen=document.getElementById('req-len'), rUp=document.getElementById('req-up'),
+          rNum=document.getElementById('req-num'), rSym=document.getElementById('req-sym');
+
+      if (!bar) return;
+      if (!val) { bar.style.display = 'none'; return; }
+      bar.style.display = 'block';
+
+      // Requirements
+      var hasLen = val.length >= 8;
+      var hasUp  = /[A-Z]/.test(val);
+      var hasNum = /[0-9]/.test(val);
+      var hasSym = /[!@#$%^&*()_+\-=\[\]{};':"\|,.<>\/?]/.test(val);
+
+      function setReq(el, ok) {
+        if (!el) return;
+        el.classList.toggle('ok', ok);
+        el.textContent = (ok ? '✓ ' : '✗ ') + el.textContent.slice(2);
+      }
+      setReq(rLen, hasLen);
+      setReq(rUp,  hasUp);
+      setReq(rNum, hasNum);
+      setReq(rSym, hasSym);
+
+      // Score
+      var score = [hasLen, hasUp, hasNum, hasSym].filter(Boolean).length;
+      if (val.length >= 12 && score >= 3) score = Math.min(score + 1, 4);
+
+      var levels = [
+        { bars: 1, color: '#ef4444', label: '🔴 ضعيفة جداً' },
+        { bars: 2, color: '#f59e0b', label: '🟡 ضعيفة' },
+        { bars: 3, color: '#3b82f6', label: '🔵 متوسطة' },
+        { bars: 4, color: '#10b981', label: '🟢 قوية جداً' },
+      ];
+      var lvl = levels[Math.min(score, 4) - 1] || levels[0];
+
+      var bars = [b1, b2, b3, b4];
+      bars.forEach(function(b, i) {
+        if (!b) return;
+        b.style.background = i < lvl.bars ? lvl.color : (document.body.classList.contains('dark') ? '#1a2f55' : '#e5e7eb');
+      });
+      if (label) { label.textContent = lvl.label; label.style.color = lvl.color; }
+    }
+    window.checkPassStrength = checkPassStrength;
+
+        async function doFgt() {
       const e = document.getElementById('liE').value.trim();
       if (!e || !e.includes('@')) { showT('أدخل بريدك الإلكتروني الصحيح أولاً', 'err'); return; }
       const fgtBtn = document.querySelector('[onclick="doFgt()"]');
